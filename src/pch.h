@@ -17,6 +17,9 @@
 #include <map>
 #include <tchar.h>
 
+// :(
+#undef PLATFORM_UNKNOWN
+
 STDAPI_(ULONG) DllAddRef();
 STDAPI_(ULONG) DllRelease();
 

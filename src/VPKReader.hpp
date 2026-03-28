@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include <vector>
 
 struct VPKHeader_v1
 {

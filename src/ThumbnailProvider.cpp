@@ -170,6 +170,7 @@ STDMETHODIMP_(HRESULT __stdcall) CVPKThumbnailProvider::GetThumbnail(UINT cx, HB
 			bitmap.GetHBITMAP(bgColor, phbmp);
 		}
 
+#if 0
 		if (*phbmp == nullptr) {
 #define CB_COLOR1 0xfe, 0x9d, 0xda, 0xff //0xda9dfe
 #define CB_COLOR2 0xff, 0xff, 0xff, 0xff
@@ -197,6 +198,7 @@ STDMETHODIMP_(HRESULT __stdcall) CVPKThumbnailProvider::GetThumbnail(UINT cx, HB
 				delete pCheckerboard;
 			}
 		}
+#endif
 	}
 
 	GdiplusShutdown(token);

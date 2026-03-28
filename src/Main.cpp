@@ -49,11 +49,11 @@ STDAPI DllRegisterServer()
 		// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.vpk
 		{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\PropertySystem\\PropertyHandlers\\.vpk", nullptr, REG_SZ, reinterpret_cast<DWORD_PTR>(szCLSID_VPKShellInfo) },
 		//{ HKEY_CLASSES_ROOT, "SystemFileAssociations\\.vpk"), "ExtendedTileInfo"), REG_SZ, reinterpret_cast<DWORD_PTR>("prop:System.ItemType;VTFShellInfo.FormatName;*System.Image.Dimensions")) },
-		{ HKEY_CLASSES_ROOT, L"SystemFileAssociations\\.vpk", L"FullDetails", REG_SZ, reinterpret_cast<DWORD_PTR>(L"prop:System.Link.TargetParsingPath;System.Title;System.Comment;System.Author;System.ContentType;System.Document.Version;System.Link.TargetUrl;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName") },
+		{ HKEY_CLASSES_ROOT, L"SystemFileAssociations\\.vpk", L"FullDetails", REG_SZ, reinterpret_cast<DWORD_PTR>(L"prop:System.Title;System.Media.SubTitle;System.Comment;System.Author;System.ContentType;System.Document.Version;System.Link.TargetUrl;System.Link.TargetParsingPath;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName") },
 		//{ HKEY_CLASSES_ROOT, "SystemFileAssociations\\.vpk"), "InfoTip"), REG_SZ, reinterpret_cast<DWORD_PTR>("prop:System.ItemType;VTFShellInfo.FormatName;*System.Image.Dimensions;*System.Size")) },
 
 		// unused System.Rating;System.Keywords;
-		{ HKEY_CLASSES_ROOT, L"SystemFileAssociations\\.vpk", L"PreviewDetails", REG_SZ, reinterpret_cast<DWORD_PTR>(L"prop:System.Link.TargetParsingPath;System.Title;System.Comment;System.Author;System.ContentType;System.Document.Version;System.Link.TargetUrl;*System.SharedWith;*System.OfflineAvailability;*System.OfflineStatus;*System.DateModified;*System.Size;*System.DateCreated") }
+		{ HKEY_CLASSES_ROOT, L"SystemFileAssociations\\.vpk", L"PreviewDetails", REG_SZ, reinterpret_cast<DWORD_PTR>(L"prop:System.Link.TargetParsingPath;System.Title;System.Media.SubTitle;System.Comment;System.Author;System.ContentType;System.Document.Version;System.Link.TargetUrl;*System.SharedWith;*System.OfflineAvailability;*System.OfflineStatus;*System.DateModified;*System.Size;*System.DateCreated") }
 	};
 	if (const auto hr = CreateRegistryKeys(keys, ARRAYSIZE(keys)); FAILED(hr))
 		return hr;

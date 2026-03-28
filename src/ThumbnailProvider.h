@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 //#define OP_InitializeWithFile 1
  
 class CVPKThumbnailProviderFactory : public IClassFactory

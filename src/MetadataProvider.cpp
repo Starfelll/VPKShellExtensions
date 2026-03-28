@@ -73,9 +73,9 @@ HRESULT CVPKMetadataProvider::StoreIntoCache(const T& value, HRESULT(*func)(U, P
 
 
 
-void print_log(std::string msg) {
+inline void print_log(std::string msg) {
 	//std::fstream f;
-	//f.open("C:/Users/nachostars/src/VPKShellExtensions/out/build/x64-Release/loggg.txt", std::ios::out | std::ios::app);
+	//f.open("C:/loggg.txt", std::ios::out | std::ios::app);
 	//f << msg << std::endl;
 }
 
@@ -159,7 +159,7 @@ HRESULT CVPKMetadataProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 			//PKEY_SourceItem
 			//InitPropVariantFromStringAsVector()
 
-			StoreIntoCache(L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2\\addons\\[m16]2992098478.vpk", InitPropVariantFromString, PKEY_Link_TargetParsingPath);
+			//StoreIntoCache(L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2\\addons\\[m16]2992098478.vpk", InitPropVariantFromString, PKEY_Link_TargetParsingPath);
 	
 
 			try {
@@ -198,7 +198,14 @@ HRESULT CVPKMetadataProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 				//	StoreIntoCache(Utf8ToWChar(e.getValue()).c_str(), InitPropVariantFromString, PKEY_Keywords);
 				//}
 
-				std::vector<std::wstring> contentTypes;
+				std::wstring contentTypes;
+				auto addContentType = [&contentTypes](std::wstring value) {
+					if (!contentTypes.empty()) {
+						contentTypes += L";";
+					}
+					contentTypes += value;
+				};
+
 				if (fs::hard_link_count(fsPath) > 1) {
 					std::wstring linkName;
 					auto findHandle = FindFirstFileName(fsPath.c_str(), linkName);
@@ -212,7 +219,7 @@ HRESULT CVPKMetadataProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 							if (linkPath != fsPath) {
 								auto relative = linkPath.lexically_relative(parentPath);
 								if ((!relative.empty()) && relative != fileName && (!relative.begin()->wstring().starts_with(L".."))) {
-									contentTypes.push_back(relative);
+									addContentType(relative);
 									break;
 								}
 							}
@@ -221,6 +228,20 @@ HRESULT CVPKMetadataProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 					}
 				}
 
+				std::wstring bspList;
+				BOOL hasMaps = FALSE;
+				vpk->runForAllEntries("maps/",
+					[&hasMaps, &bspList](const std::string& path, const vpkpp::Entry& entry) {
+						if (path.ends_with(".bsp")) {
+							if (!bspList.empty()) {
+								bspList += L";";
+							}
+							bspList += Utf8ToWChar(path.substr(5, path.size() - 4 - 4 - 1));
+							hasMaps = TRUE;
+						}
+					}
+				, false);
+
 				if (contentTypes.empty()) {
 					auto isKeyOn = [&info](const char* key) {
 							if (info.hasChild(key)) {
@@ -228,56 +249,39 @@ HRESULT CVPKMetadataProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 							}
 							return false;
 						};
-
-					BOOL hasMaps = FALSE;
-					vpk->runForAllEntries("maps/", [&hasMaps](const std::string& path, const vpkpp::Entry& entry) {
-							if (path.ends_with(".bsp")) {
-								hasMaps = TRUE;
-							}
-						}
-					, false);
 					if (hasMaps || isKeyOn("addonContent_Campaign") || isKeyOn("addonContent_Map")) {
-						contentTypes.push_back(L"Campaigns");
+						addContentType(L"Campaigns");
 					}
 					if (isKeyOn("addonContent_weapon")) {
-						contentTypes.push_back(L"Weapons");
+						addContentType(L"Weapons");
 					}
 					if (isKeyOn("addonContent_BossInfected") || isKeyOn("addonContent_CommonInfected")) {
-						contentTypes.push_back(L"Infected");
+						addContentType(L"Infected");
 					}
 					if (isKeyOn("addonContent_Survivor")) {
-						contentTypes.push_back(L"Survivors");
+						addContentType(L"Survivors");
 					}
 					if (isKeyOn("addonContent_prop")) {
-						contentTypes.push_back(L"Items");
+						addContentType(L"Items");
 					}
 					if (isKeyOn("addonContent_Sound") || isKeyOn("addonContent_Music")) {
-						contentTypes.push_back(L"Sounds");
+						addContentType(L"Sounds");
 					}
 					if (isKeyOn("addonContent_Script")) {
-						contentTypes.push_back(L"Scripts");
+						addContentType(L"Scripts");
 					}
 					if (isKeyOn("addonContent_Skin")) {
-						contentTypes.push_back(L"Skins");
+						addContentType(L"Skins");
 					}
 				}
 
 				if (!contentTypes.empty()) {
-					std::wstring tmp;
-					bool isFirst = true;
-					for (auto& it : contentTypes) {
-						if (!isFirst) {
-							tmp += L";";
-						}
-						else {
-							isFirst = false;
-						}
-						tmp += it.c_str();
-					}
-					StoreIntoCache(tmp.c_str(), InitPropVariantFromString, PKEY_ContentType);
+					StoreIntoCache(contentTypes.c_str(), InitPropVariantFromString, PKEY_ContentType);
 				}
 
-
+				if (!bspList.empty()) {
+					StoreIntoCache(bspList.c_str(), InitPropVariantFromString, PKEY_Media_SubTitle);
+				}
 
 			}
 			catch (...) {
@@ -400,7 +404,9 @@ HRESULT CVPKMetadataProvider::Commit()
 						.vpk_preloadBytes = vpkpp::VPK_MAX_PRELOAD_BYTES,
 						.vpk_saveToDirectory = true
 					};
-					vpk->addEntry(ADDONINFO, reinterpret_cast<const std::byte*>(bakedAddonInfo.data()), bakedAddonInfo.size(), options);
+
+					auto addonInfoReader = std::span(reinterpret_cast<std::byte*>(bakedAddonInfo.data()), bakedAddonInfo.size());
+					vpk->addEntry(ADDONINFO, addonInfoReader, options);
 
 					if (vpk->bake("", vpkpp::BakeOptions(), nullptr)) {
 						m_pStore->Commit();
@@ -438,6 +444,12 @@ HRESULT CVPKMetadataProvider::IsPropertyWritable(REFPROPERTYKEY key)
 	else if (IsEqualPropertyKey(key, PKEY_Link_TargetUrl)) {
 		PSC_STATE state;
 		if (SUCCEEDED(m_pStore->GetState(PKEY_Link_TargetUrl, &state))) {
+			hr = S_OK;
+		}
+	}
+	else if (IsEqualPropertyKey(key, PKEY_Media_SubTitle)) {
+		PSC_STATE state;
+		if (SUCCEEDED(m_pStore->GetState(PKEY_Media_SubTitle, &state))) {
 			hr = S_OK;
 		}
 	}
