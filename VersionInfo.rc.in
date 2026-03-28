@@ -19,7 +19,7 @@ BEGIN
             VALUE "FileDescription", "VPKShellExtensions"
             VALUE "FileVersion", "${PROJECT_VERSION_MAJOR}, ${PROJECT_VERSION_MINOR}, ${PROJECT_VERSION_PATCH}"
             VALUE "InternalName", "VPKShellExtensions.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2026"
+            VALUE "LegalCopyright", "@Starfelll 2026"
             VALUE "OriginalFilename", "VPKShellExtensions.dll"
             VALUE "ProductName", "VPKShellExtensions"
             VALUE "ProductVersion", "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
