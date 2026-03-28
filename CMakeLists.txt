@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(vpk_shell_extensions VERSION 1.2.0)
+project(vpk_shell_extensions VERSION 2.0.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #ADD_DEFINITIONS(-Wall -DWIN32_LEAN_AND_MEAN -DUNICODE -D_CRT_SECURE_NO_WARNINGS)

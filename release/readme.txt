@@ -1,4 +1,4 @@
-资源管理器vpk略缩图插件v1.2
+资源管理器vpk略缩图插件v2
 https://www.bilibili.com/video/BV1zpKGeME53
 
 安装：右键管理员身份运行register.bat
